@@ -1,0 +1,15 @@
+# Конфиги с ключами
+Config.plist
+
+# Файлы macOS
+.DS_Store
+
+# Xcode
+DerivedData/
+*.xcuserstate
+*.xcworkspace
+xcuserdata/
+
+# Build
+build/
+*.pbxuser
