@@ -105,6 +105,8 @@ struct MainScreen: View {
                     .animation(.easeInOut, value: weather.feelsLike)
                 Text(currentWeekday())
                     .font(.title)
+                    .foregroundColor(.black)
+                    .fontWeight(.heavy)
                     .padding(.bottom, 1)
                     .padding(.top, 4)
                 Spacer()
