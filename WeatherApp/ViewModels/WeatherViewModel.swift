@@ -36,7 +36,7 @@ final class WeatherViewModel: ObservableObject {
         } catch {
             cityName = "Error"
             temperature = 0
-            description = error.localizedDescription
+            description = "To see the weather, please enter a valid city name"
         }
         
     }

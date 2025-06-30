@@ -13,5 +13,6 @@ extension Color {
     static let lightBlue = Color(red: 173/255, green: 216/255, blue: 230/255)
     static let darkGray = Color(red: 64/255, green: 64/255, blue: 64/255)
     static let darkBlue = Color(red: 0/255, green: 51/255, blue: 102/255)
+    static let lightGray = Color(red: 0.85, green: 0.85, blue: 0.85)
 }
 

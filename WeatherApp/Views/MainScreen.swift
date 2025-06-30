@@ -10,12 +10,12 @@ import SwiftUI
 
 struct MainScreen: View {
     @StateObject private var weather = WeatherViewModel()
-    @State var city: String = "Pavlodar"
+    @State var city: String = "Сhoose a city"
     @State var showMenu: Bool = false
-    
+    @State var isPresented = false
     var textColor: Color {
         switch weather.description {
-        case "SCATTERED CLOUDS", "FEW CLOUDS", "BROKEN CLOUDS":
+        case "SCATTERED CLOUDS", "FEW CLOUDS", "BROKEN CLOUDS", "OVERCAST CLOUDS":
             return .white
         case "CLEAR SKY":
             return .lightYellow
@@ -29,7 +29,7 @@ struct MainScreen: View {
     }
     var mainTextColor: Color {
         switch weather.description {
-        case "SCATTERED CLOUDS", "FEW CLOUDS", "BROKEN CLOUDS":
+        case "SCATTERED CLOUDS", "FEW CLOUDS", "BROKEN CLOUDS", "OVERCAST CLOUDS":
             return .black
         case "CLEAR SKY":
             return .orange
@@ -50,6 +50,7 @@ struct MainScreen: View {
                     .fill(styleForBackground("\(weather.description)")
                     )
                     .ignoresSafeArea()
+                    .animation(.easeInOut(duration: 0.5), value: weather.description)
             }
             VStack {
                 HStack {
@@ -58,58 +59,75 @@ struct MainScreen: View {
                             showMenu.toggle()
                         }
                     } label: {
-                        Text("\(city)")
-                            .foregroundColor(textColor)
-                            .fontWeight(.bold)
+                        if city.isEmpty {
+                            Text("Choose a city")
+                                .foregroundColor(textColor)
+                                .fontWeight(.bold)
+                        } else {
+                            Text("\(city)")
+                                .foregroundColor(textColor)
+                                .fontWeight(.bold)
+                        }
                     }
                     .padding()
                     Spacer()
                 }
                 Spacer()
-                switch weather.description {
-                case "SCATTERED CLOUDS", "FEW CLOUDS":
-                    Text("\u{26C5}")
-                        .frame(width: 200, height: 150)
-                        .font(.system(size: 150))
-                        .shadow(color: .black, radius: 50)
-                case "BROKEN CLOUDS":
-                    Text("\u{2601}")
-                        .frame(width: 200, height: 150)
-                        .font(.system(size: 150))
-                        .shadow(color: .black, radius: 50)
-                case "CLEAR SKY":
-                    Text("\u{2600}")
-                        .frame(width: 200, height: 150)
-                        .font(.system(size: 150))
-                        .shadow(color: .yellow, radius: 100)
-                case "MODERATE RAIN", "LIGHT RAIN":
-                    Text("\u{1F327}")
-                        .frame(width: 200, height: 150)
-                        .font(.system(size: 150))
-                        .shadow(color: .blue, radius: 100)
-                case "THUNDERSTORM":
-                    Text("\u{26C8}")
-                        .frame(width: 200, height: 150)
-                        .font(.system(size: 150))
-                        .shadow(color: .blue, radius: 100)
-                    
-                default:
-                    Text("None")
+                Group {
+                    switch weather.description {
+                    case "SCATTERED CLOUDS", "FEW CLOUDS":
+                        Text("\u{26C5}")
+                            .frame(width: 200, height: 150)
+                            .font(.system(size: 150))
+                            .shadow(color: .black, radius: 50)
+                    case "BROKEN CLOUDS", "OVERCAST CLOUDS":
+                        Text("\u{2601}")
+                            .frame(width: 200, height: 150)
+                            .font(.system(size: 150))
+                            .shadow(color: .black, radius: 50)
+                    case "CLEAR SKY":
+                        Text("\u{2600}")
+                            .frame(width: 200, height: 150)
+                            .font(.system(size: 150))
+                            .shadow(color: .yellow, radius: 100)
+                    case "MODERATE RAIN", "LIGHT RAIN":
+                        Text("\u{1F327}")
+                            .frame(width: 200, height: 150)
+                            .font(.system(size: 150))
+                            .shadow(color: .blue, radius: 100)
+                    case "THUNDERSTORM":
+                        Text("\u{26C8}")
+                            .frame(width: 200, height: 150)
+                            .font(.system(size: 150))
+                            .shadow(color: .blue, radius: 100)
+                        
+                    default:
+                        Text("\u{1F914}")
+                            .frame(width: 200, height: 150)
+                            .font(.system(size: 130))
+                            .shadow(color: .blue, radius: 50)
+                    }
                 }
+                .animation(.easeInOut(duration: 0.5), value: weather.description)
                 Text("\(weather.description)")
+                    .frame(width: 300)
+                    .multilineTextAlignment(.center)
                     .padding(.top, 20)
+                    .animation(.easeInOut(duration: 0.5), value: weather.description)
                     .transition(.opacity)
                     .font(.system(size: 25, weight: .bold))
                     .foregroundColor(mainTextColor)
                     .animation(.easeInOut, value: weather.description)
                 Text("\(weather.temperature, specifier:"%.1f") °C")
                     .padding(.top, 20)
+                    .animation(.easeInOut(duration: 0.5), value: weather.temperature)
                     .transition(.opacity)
                     .font(.system(size: 50, weight: .bold))
                     .foregroundColor(mainTextColor)
                     .animation(.easeInOut, value: weather.temperature)
                 Text("Feels like \(weather.feelsLike, specifier:"%.1f") °C")
                     .fontWeight(.bold)
+                    .animation(.easeInOut(duration: 0.5), value: weather.feelsLike)
                     .foregroundColor(mainTextColor)
                     .transition(.opacity)
                     .animation(.easeInOut, value: weather.feelsLike)
@@ -168,14 +186,21 @@ struct MainScreen: View {
                 
                 
             }
-            if showMenu {
-                Group {
-                    CityMenuView(city: $city)
-                        .frame(width: 150, height: 150)
-                        .transition(.move(edge: .top).combined(with: .opacity))
-                }
-            }
+            CityMenuView(city: $city, isPresented: $isPresented)
+                .frame(width: 150, height: 150)
+                .opacity(showMenu ? 1 : 0)
+                .offset(y: showMenu ? 0 : -50)
+                .animation(.easeInOut(duration: 0.4), value: showMenu)
+
             
+        }
+        .onTapGesture {
+            withAnimation {
+                showMenu = false
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                showMenu = false
+            }
         }
         .onAppear {
             Task {
@@ -197,9 +222,9 @@ struct MainScreen: View {
                 startRadius: 150,
                 endRadius: 300
             )
-        case "BROKEN CLOUDS":
+        case "BROKEN CLOUDS", "OVERCAST CLOUDS":
             return RadialGradient(
-                gradient: Gradient(colors: [.gray.opacity(0.5), .white.opacity(0.9), .darkGray.opacity(0.7)]),
+                gradient: Gradient(colors: [.lightGray, .white.opacity(0.9), .darkGray.opacity(0.7)]),
                 center: .center,
                 startRadius: 150,
                 endRadius: 300
