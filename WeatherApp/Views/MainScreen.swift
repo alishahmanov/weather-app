@@ -10,7 +10,7 @@ import SwiftUI
 
 struct MainScreen: View {
     @StateObject private var weather = WeatherViewModel()
-    @State var city: String = "Astana"
+    @State var city: String = "Pavlodar"
     @State var showMenu: Bool = false
     
     var textColor: Color {
@@ -20,6 +20,8 @@ struct MainScreen: View {
         case "CLEAR SKY":
             return .lightYellow
         case "MODERATE RAIN", "LIGHT RAIN":
+            return .lightBlue
+        case "THUNDERSTORM":
             return .lightBlue
         default:
             return .black
@@ -32,6 +34,8 @@ struct MainScreen: View {
         case "CLEAR SKY":
             return .orange
         case "MODERATE RAIN", "LIGHT RAIN":
+            return .darkBlue
+        case "THUNDERSTORM":
             return .darkBlue
             
         default:
@@ -83,6 +87,12 @@ struct MainScreen: View {
                         .frame(width: 200, height: 150)
                         .font(.system(size: 150))
                         .shadow(color: .blue, radius: 100)
+                case "THUNDERSTORM":
+                    Text("\u{26C8}")
+                        .frame(width: 200, height: 150)
+                        .font(.system(size: 150))
+                        .shadow(color: .blue, radius: 100)
+                    
                 default:
                     Text("None")
                 }
@@ -207,6 +217,13 @@ struct MainScreen: View {
                 center: .center,
                 startRadius: 150,
                 endRadius: 300
+            )
+        case "THUNDERSTORM":
+            return RadialGradient(
+                gradient: Gradient(colors: [.white, .gray.opacity(0.6), .yellow.opacity(0.5), .darkBlue.opacity(0.9)]),
+                center: .center,
+                startRadius: 150,
+                endRadius: 320
             )
         default:
             return RadialGradient(
